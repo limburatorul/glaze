@@ -35,8 +35,7 @@
     "publish": {
       "provider": "github",
       "owner": "limburatorul",
-      "repo": "glaze",
-      "releaseType": "release"
+      "repo": "glaze"
     },
     "directories": {
       "output": "release"
