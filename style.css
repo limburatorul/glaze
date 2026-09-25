@@ -1,0 +1,151 @@
+/* ---------- Temă ---------- */
+html {
+  --accent: #8b5cf6;
+  --yt-spec-raised-background: rgba(22, 22, 28, 0.45) !important;
+  --yt-spec-menu-background: rgba(28, 28, 36, 0.75) !important;
+  --yt-spec-general-background-a: #0e0e12 !important;
+  --yt-spec-brand-background-solid: #0e0e12 !important;
+  --yt-spec-static-brand-red: var(--accent) !important;
+  --yt-spec-red-indicator: var(--accent) !important;
+}
+ytd-app, #masthead-container, #background.ytd-masthead, tp-yt-app-drawer #contentContainer {
+  background: var(--yt-spec-base-background) !important;
+}
+.ytp-play-progress, .ytp-swatch-background-color, .ytp-volume-slider-handle,
+.ytp-volume-slider-handle::before, ytd-thumbnail-overlay-resume-playback-renderer #progress {
+  background: var(--accent) !important;
+}
+.ytp-scrubber-button { background: var(--accent) !important; }
+ytd-thumbnail, ytd-thumbnail img, yt-image img, .yt-lockup-view-model img { border-radius: 12px !important; }
+
+/* ---------- Sticlă (rețeta acrylic din nota Branding) ---------- */
+#masthead-container, ytd-masthead, ytd-masthead #background,
+ytd-feed-filter-chip-bar-renderer #chips-wrapper, #frosted-glass {
+  background: transparent !important;
+}
+/* grain fin (~7%) ca strat de fundal, cu opacitatea în SVG: YouTube are propriul
+   #masthead-container::after (bandă de 5px), deci pseudo-elementul nu e liber */
+#masthead-container {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E"),
+    rgba(14, 14, 18, 0.55) !important;
+  backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
+}
+/* bara de filtre de pe homepage e lipită sub masthead → aceeași sticlă */
+/* pe #chips-wrapper (position: fixed), nu pe părinte: backdrop-filter pe părinte l-ar deplasa */
+ytd-feed-filter-chip-bar-renderer #chips-wrapper {
+  background: rgba(14, 14, 18, 0.55) !important;
+  backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
+}
+
+/* ---------- Fundal cu imagine (background.jpg lângă main.js) ---------- */
+html {
+  background: #0e0e12 var(--wallpaper, none) center / cover fixed !important;
+  --yt-spec-base-background: transparent !important;
+}
+/* vinietă: ține textul lizibil indiferent de imagine */
+html::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+  background: radial-gradient(ellipse at center, rgba(14,14,18,0.25), rgba(14,14,18,0.6));
+}
+body, ytd-app, #page-manager, ytd-browse, ytd-watch-flexy, ytd-search,
+ytd-two-column-browse-results-renderer, #columns { background: transparent !important; }
+/* meniul lateral = sticlă */
+tp-yt-app-drawer #contentContainer, ytd-mini-guide-renderer {
+  background: rgba(14, 14, 18, 0.45) !important;
+  backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
+}
+/* chenar fin pe miniaturi */
+ytd-thumbnail, yt-thumbnail-view-model { outline: 1px solid rgba(255,255,255,0.08); outline-offset: -1px; border-radius: 12px; }
+
+/* ---------- Pagina de video = sticlă ---------- */
+/* zona playerului: benzile laterale devin sticlă în loc de negru */
+ytd-watch-flexy #full-bleed-container {
+  background: rgba(14, 14, 18, 0.35) !important;
+  backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
+}
+ytd-watch-flexy #movie_player, ytd-watch-flexy .html5-video-container { background: transparent !important; }
+/* blur din clip pe margini: canvas inserat din main.js, pornit din meniul Afișare */
+#yp-ambient {
+  display: none; position: absolute; inset: 0; width: 100%; height: 100%;
+  filter: blur(calc(60px * var(--glass-blur-scale, 1))) saturate(1.4);
+  transform: scale(1.2); pointer-events: none;
+}
+ytd-watch-flexy #full-bleed-container { overflow: hidden; }
+ytd-watch-flexy #full-bleed-container > :not(#yp-ambient) { position: relative; }
+/* titlu + canal + descriere = panou */
+ytd-watch-flexy ytd-watch-metadata {
+  background: rgba(14, 14, 18, 0.45) !important;
+  backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px; padding: 12px 16px; box-sizing: border-box;
+}
+ytd-watch-flexy #description.ytd-watch-metadata { background: rgba(255, 255, 255, 0.06) !important; }
+
+/* controalele playerului (pastilele play / volum / timp / capitol / dreapta) */
+.ytp-play-button, .ytp-volume-area, .ytp-time-wrapper, .ytp-chapter-title, .ytp-right-controls {
+  background: rgba(14, 14, 18, 0.3) !important;
+}
+/* YouTube are deja blur pe ele, dar îl stinge prin variabila asta */
+html, #movie_player { --yt-frosted-glass-backdrop-filter-override: blur(calc(16px * var(--glass-blur-scale, 1))) saturate(1.2) !important; }
+/* meniul de setări al playerului */
+.ytp-popup {
+  background: rgba(28, 28, 36, 0.75) !important;
+  backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
+}
+
+/* ---------- Restul = sticlă ---------- */
+/* meniuri și dropdown-uri: alfa mai mare (0.75), ca să rămână lizibile */
+ytd-menu-popup-renderer, ytd-multi-page-menu-renderer, yt-sheet-view-model, yt-list-view-model,
+tp-yt-paper-dialog, .ytSearchboxComponentSuggestionsContainer {
+  background: rgba(28, 28, 36, 0.75) !important;
+  backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
+}
+/* bara de căutare */
+.ytSearchboxComponentInputBox, .ytSearchboxComponentSearchButton {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+/* playlist și chat pe pagina de video */
+ytd-playlist-panel-renderer #container, ytd-live-chat-frame {
+  background: rgba(14, 14, 18, 0.45) !important;
+  backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px;
+}
+
+/* ---------- Curățenie ---------- */
+ytd-rich-section-renderer:not(:has(ytd-feed-nudge-renderer)), /* rafturi Shorts / "Breaking news"; nu și mesajul "history is off", singurul conținut al homepage-ului pentru cine nu e logat */
+ytd-reel-shelf-renderer,                 /* Shorts în căutare / sidebar */
+grid-shelf-view-model,
+ytd-guide-entry-renderer:has(a[title="Shorts"]),
+ytd-mini-guide-entry-renderer:has(a[title="Shorts"], a[aria-label="Shorts"]),
+ytd-statement-banner-renderer, ytd-banner-promo-renderer, #masthead-ad,
+ytd-ad-slot-renderer, ytd-merch-shelf-renderer,
+#voice-search-button,
+ytd-guide-section-renderer:has(#guide-section-title) /* "Explorează", "Mai multe de la YouTube" */
+{ display: none !important; }
+
+/* ---------- Grilă: lățimea cardului din Setări, coloanele se calculează singure ---------- */
+ytd-rich-grid-renderer #contents {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--yp-card, 300px), 100%), 1fr));
+  gap: 0 16px;
+}
+ytd-rich-grid-renderer #contents > ytd-rich-item-renderer { width: auto !important; margin: 0 0 16px !important; }
+ytd-rich-grid-renderer #contents > :not(ytd-rich-item-renderer) { grid-column: 1 / -1; }
+
+/* ---------- Bara de sus = bara de titlu a ferestrei ---------- */
+#masthead-container { -webkit-app-region: drag; }
+#masthead-container :is(button, a, input, form, ytd-searchbox, yt-searchbox, ytd-topbar-menu-button-renderer, #yp-settings) {
+  -webkit-app-region: no-drag;
+}
+/* loc pentru butoanele Windows (minimizare / maximizare / închidere) desenate peste bară */
+ytd-masthead #end { padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw)); }
+#yp-settings {
+  width: 40px; height: 40px; margin-left: 8px; border: 0; border-radius: 50%; padding: 8px;
+  background: transparent; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+#yp-settings:hover { background: rgba(255, 255, 255, 0.1); }
+#yp-settings:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#yp-settings svg { width: 24px; height: 24px; fill: currentColor; }
