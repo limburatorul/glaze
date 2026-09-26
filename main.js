@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, ipcMain, nativeTheme, session } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, nativeTheme, session, shell } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const fs = require('fs');
 const path = require('path');
@@ -132,11 +132,16 @@ app.whenReady().then(async () => {
     if (settingsWin) return settingsWin.focus();
     // Acrylic per the Branding note: backgroundMaterial + transparent color, not transparent: true.
     settingsWin = new BrowserWindow({
-      parent: win, width: 420, height: 520, useContentSize: true, resizable: false, minimizable: false, maximizable: false,
+      parent: win, width: 420, height: 641, useContentSize: true, resizable: false, minimizable: false, maximizable: false,
       title: 'Glaze settings', backgroundMaterial: 'acrylic', backgroundColor: '#00000000',
       webPreferences: { preload },
     });
     settingsWin.loadFile(path.join(__dirname, 'settings.html'));
+    // The footer links open in the user's browser / mail client, never inside this window.
+    settingsWin.webContents.on('will-navigate', (e, url) => {
+      e.preventDefault();
+      if (/^(https:\/\/protagonistlabs\.app\/|mailto:feedback@protagonistlabs\.app\?)/.test(url)) shell.openExternal(url);
+    });
     settingsWin.on('closed', () => { settingsWin = null; });
   };
   ipcMain.on('open-settings', openSettings);

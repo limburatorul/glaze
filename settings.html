@@ -36,7 +36,11 @@
     appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent);
     border: 2px solid #fff; box-sizing: border-box;
   }
-  input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .links { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 10px 0; }
+  .links a { color: var(--text); text-decoration: none; }
+  .links a:hover { color: var(--accent); }
+  .links span { color: var(--muted); user-select: text; }
+  input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -63,6 +67,15 @@
     <label>Card width
       <span class="range"><input type="range" data-key="card" min="180" max="600" step="10"><output></output></span>
     </label>
+  </section>
+  <section>
+    <h2>Glaze</h2>
+    <div class="links">
+      <a href="mailto:feedback@protagonistlabs.app?subject=Glaze%20feedback">Send feedback</a>
+      <span>feedback@protagonistlabs.app</span>
+      <a href="https://protagonistlabs.app/glaze/?utm_source=app&amp;utm_medium=glaze">Website</a>
+      <a href="https://protagonistlabs.app/?utm_source=app&amp;utm_medium=glaze">More apps from Protagonist Labs</a>
+    </div>
   </section>
 <script>
   const show = { blur: v => v === 0 ? 'off' : `${Math.round(v * 100)}%`, card: v => `${v}px` };
