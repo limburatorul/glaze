@@ -52,7 +52,7 @@ It is not code-signed, so SmartScreen shows *"Windows protected your PC"* the fi
 npm install
 npm start          # run it
 npm run dist       # release\Glaze-Setup-<version>.exe and Glaze-<version>-portable.exe
-npm run release    # same, uploaded to a draft GitHub release (needs GH_TOKEN);
+npm run release    # same, uploaded to one draft GitHub release (needs gh auth login);
                    # publishing the draft is what ships the update
 ```
 

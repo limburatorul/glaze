@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder --win nsis portable",
-    "release": "electron-builder --win nsis portable --publish always"
+    "release": "electron-builder --win nsis portable --publish never && gh release create v%npm_package_version% --draft --title \"Glaze %npm_package_version%\" release/Glaze-Setup-%npm_package_version%.exe release/Glaze-Setup-%npm_package_version%.exe.blockmap release/Glaze-%npm_package_version%-portable.exe release/latest.yml"
   },
   "build": {
     "appId": "app.protagonistlabs.glaze",
