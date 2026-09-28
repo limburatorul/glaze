@@ -38,7 +38,7 @@ ytd-feed-filter-chip-bar-renderer #chips-wrapper {
   backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
 }
 
-/* ---------- Fundal cu imagine (background.jpg lângă main.js) ---------- */
+/* ---------- Fundal cu imagine (background.png din aplicație, sau background.* lângă Glaze.exe) ---------- */
 html {
   background: #0e0e12 var(--wallpaper, none) center / cover fixed !important;
   --yt-spec-base-background: transparent !important;
@@ -65,7 +65,7 @@ ytd-watch-flexy #full-bleed-container {
   backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
 }
 ytd-watch-flexy #movie_player, ytd-watch-flexy .html5-video-container { background: transparent !important; }
-/* blur din clip pe margini: canvas inserat din main.js, pornit din meniul Afișare */
+/* blur din clip pe margini: canvas inserat de page.js, pornit din Setări */
 #yp-ambient {
   display: none; position: absolute; inset: 0; width: 100%; height: 100%;
   filter: blur(calc(60px * var(--glass-blur-scale, 1))) saturate(1.4);
@@ -136,12 +136,25 @@ ytd-rich-grid-renderer #contents > ytd-rich-item-renderer { width: auto !importa
 ytd-rich-grid-renderer #contents > :not(ytd-rich-item-renderer) { grid-column: 1 / -1; }
 
 /* ---------- Bara de sus = bara de titlu a ferestrei ---------- */
-#masthead-container { -webkit-app-region: drag; }
+#masthead-container { -webkit-app-region: drag; app-region: drag; }
 #masthead-container :is(button, a, input, form, ytd-searchbox, yt-searchbox, ytd-topbar-menu-button-renderer, #yp-settings) {
-  -webkit-app-region: no-drag;
+  -webkit-app-region: no-drag; app-region: no-drag;
 }
-/* loc pentru butoanele Windows (minimizare / maximizare / închidere) desenate peste bară */
-ytd-masthead #end { padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw)); }
+/* loc pentru butoanele Windows (minimizare / maximizare / închidere), puse de page.js peste capătul barei */
+ytd-masthead #end { padding-right: 138px; }
+#yp-caption {
+  position: fixed; top: 0; right: 0; z-index: 10000; display: flex; height: 56px;
+  -webkit-app-region: no-drag; app-region: no-drag;
+}
+#yp-caption button {
+  width: 46px; height: 100%; border: 0; padding: 0; background: transparent; color: #fff;
+  font: 10px "Segoe Fluent Icons", "Segoe MDL2 Assets"; cursor: default;
+}
+#yp-caption button:hover { background: rgba(255, 255, 255, 0.1); }
+#yp-caption .yp-caption-close:hover { background: #c42b1c; }
+#yp-caption button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* pe tot ecranul (F11 sau butonul playerului) nu e nicio bară de titlu */
+html.yp-fullscreen #yp-caption, html:has(:fullscreen) #yp-caption { display: none; }
 #yp-settings {
   width: 40px; height: 40px; margin-left: 8px; border: 0; border-radius: 50%; padding: 8px;
   background: transparent; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
