@@ -132,7 +132,10 @@ public static class Updater
               :move
               move /y "{download}" "{exe}" >nul || (timeout /t 1 /nobreak >nul & goto move)
               """
-            : $"\"{download}\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART";
+            : $"""
+              "{download}" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+              del "{download}"
+              """;
         var script = Path.Combine(Path.GetTempPath(), $"glaze-update-{pid}.cmd");
         File.WriteAllText(script, $"""
             @echo off
@@ -154,7 +157,8 @@ internal static class UpdatePrompt
     {
         var update = new TaskDialogButton("Update") { AllowCloseDialog = false };
         var later = new TaskDialogButton("Later");
-        var notes = release.Notes.Trim();
+        // Release notes are written in Markdown for GitHub; a task dialog shows plain text.
+        var notes = release.Notes.Replace("**", "").Replace("`", "").Trim();
         var ask = new TaskDialogPage
         {
             Caption = "Glaze update",
