@@ -24,7 +24,7 @@ public sealed class MainForm : Form
     private readonly WebView2 _web = new() { Dock = DockStyle.Fill, DefaultBackgroundColor = Color.FromArgb(0x0e, 0x0e, 0x12) };
     private CoreWebView2Environment? _env;
     private SettingsForm? _settings;
-    private string _pageJs = "", _baseCss = "";
+    private string _frameJs = "", _pageJs = "", _baseCss = "";
     private (FormWindowState State, Rectangle Bounds)? _beforeFullScreen;
 
     public MainForm()
@@ -39,7 +39,7 @@ public sealed class MainForm : Form
         // The WinForms control turns WebView2's accelerator keys into KeyDown; Handled keeps them from the page.
         _web.KeyDown += OnKey;
         Load += async (_, _) => await Start();
-        Resize += (_, _) => Run($"window.__glaze && window.__glaze.maximized({Js(WindowState == FormWindowState.Maximized)})");
+        Resize += (_, _) => Run($"window.__glazeFrame && window.__glazeFrame.maximized({Js(WindowState == FormWindowState.Maximized)})");
     }
 
     private async Task Start()
@@ -74,6 +74,8 @@ public sealed class MainForm : Form
 
         await LoadExtensions(core.Profile);
 
+        _frameJs = Resources.Text("frame.js").Replace("%ICON%",
+            "data:image/png;base64," + Convert.ToBase64String(File.ReadAllBytes(Path.Combine(Resources.Web, "icon.png"))));
         _pageJs = Resources.Text("page.js");
         _baseCss = Resources.Text("style.css") + Wallpaper();
 
@@ -137,10 +139,15 @@ public sealed class MainForm : Form
 
     private async Task Inject()
     {
-        if (!OnYouTube(_web.Source.ToString())) return; // Google's sign-in pages are left as they are
-        await _web.CoreWebView2.ExecuteScriptAsync(_pageJs);
-        await _web.CoreWebView2.ExecuteScriptAsync($"window.__glaze.css({Js(_baseCss)}, {Js(OptionsCss())}); " +
-            $"window.__glaze.maximized({Js(WindowState == FormWindowState.Maximized)}); window.__glaze.fullscreen({Js(_beforeFullScreen != null)})");
+        // The window's buttons on every page; on anything but YouTube (Google's sign-in) a Glaze title bar too.
+        var core = _web.CoreWebView2;
+        await core.ExecuteScriptAsync(_frameJs);
+        await core.ExecuteScriptAsync($"window.__glazeFrame.maximized({Js(WindowState == FormWindowState.Maximized)}); " +
+            $"window.__glazeFrame.fullscreen({Js(_beforeFullScreen != null)})");
+        // YouTube's restyling only on YouTube: the sign-in pages keep their own look.
+        if (!OnYouTube(_web.Source.ToString())) return;
+        await core.ExecuteScriptAsync(_pageJs);
+        await core.ExecuteScriptAsync($"window.__glaze.css({Js(_baseCss)}, {Js(OptionsCss())})");
     }
 
     private void Run(string script)
@@ -159,15 +166,16 @@ public sealed class MainForm : Form
 
     private void OnMessage(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
-        // Only youtube.com gets the page script; anything else posting here is ignored.
-        if (!OnYouTube(e.Source)) return;
         JsonNode? msg;
         try { msg = JsonNode.Parse(e.WebMessageAsJson); } catch (JsonException) { return; }
         switch (msg?["type"]?.GetValueKind() == JsonValueKind.String ? (string?)msg["type"] : null)
         {
-            case "openSettings":
+            // Only youtube.com has the settings button.
+            case "openSettings" when OnYouTube(e.Source):
                 ShowSettings();
                 break;
+            // The window's own buttons are on every page (frame.js), Google's sign-in included. The most any
+            // page can do with these is minimise, maximise or close the window.
             case "window":
                 switch (msg!["action"]?.GetValueKind() == JsonValueKind.String ? (string?)msg["action"] : null)
                 {
@@ -232,7 +240,7 @@ public sealed class MainForm : Form
             Bounds = bounds;
             WindowState = state;
         }
-        Run($"window.__glaze && window.__glaze.fullscreen({Js(on)})");
+        Run($"window.__glazeFrame && window.__glazeFrame.fullscreen({Js(on)})");
     }
 
     protected override void OnHandleCreated(EventArgs e)

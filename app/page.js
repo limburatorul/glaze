@@ -49,23 +49,6 @@
   addGear();
   setInterval(addGear, 1000);
 
-  // Minimise / maximise / close. The window has no title bar of its own: YouTube's top bar is it,
-  // dragged through app-region (style.css), and these sit over its right end like Windows' own.
-  const caption = document.createElement('div');
-  caption.id = 'yp-caption';
-  const button = (action, label, glyph) => {
-    const b = document.createElement('button');
-    b.className = 'yp-caption-' + action; b.title = label; b.setAttribute('aria-label', label);
-    b.textContent = glyph;
-    b.onclick = () => post({ type: 'window', action });
-    caption.append(b);
-    return b;
-  };
-  button('minimize', 'Minimize', '\uE921');
-  const max = button('maximize', 'Maximize', '\uE922');
-  button('close', 'Close', '\uE8BB');
-  document.documentElement.append(caption);
-
   // Ctrl+P is caught here rather than by the app: picture-in-picture needs a real key press.
   document.addEventListener('keydown', e => {
     if (!e.ctrlKey || e.shiftKey || e.altKey || e.key.toLowerCase() !== 'p') return;
@@ -79,15 +62,6 @@
     css(baseCss, optionsCss) {
       if (baseCss !== null) base.textContent = baseCss;
       options.textContent = optionsCss;
-    },
-    maximized(on) {
-      max.textContent = on ? '\uE923' : '\uE922';
-      max.title = on ? 'Restore' : 'Maximize';
-      max.setAttribute('aria-label', max.title);
-    },
-    // F11 fills the screen with the window itself; there is no title bar to draw then.
-    fullscreen(on) {
-      document.documentElement.classList.toggle('yp-fullscreen', on);
     },
   };
 })();

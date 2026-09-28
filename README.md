@@ -60,7 +60,7 @@ powershell -File installer\build.ps1            # dist\Glaze-Setup-<version>.exe
 
 The version is `<Version>` in `app/Glaze.csproj`, and nowhere else. A release is `gh release create v<version>` with the three files from `dist\`: installed copies update from the `Glaze-Setup-` installer, portable ones from the `-portable.exe`, and copies of Glaze 1.x from `latest.yml`.
 
-C#, WinForms and WebView2. `style.css`, `settings.html` and `app/page.js` are what Glaze puts into YouTube and its settings window; they and every unpacked extension in `extensions\<name>\` (with its `manifest.json`) are built into the exe.
+C#, WinForms and WebView2. `style.css`, `settings.html` and `app/page.js` are what Glaze puts into YouTube and its settings window; `app/frame.js` draws the window's buttons on every page, and a Glaze title bar on pages that aren't YouTube, such as Google's sign-in; they and every unpacked extension in `extensions\<name>\` (with its `manifest.json`) are built into the exe.
 
 ## Licence
 

@@ -126,6 +126,10 @@ ytd-ad-slot-renderer, ytd-merch-shelf-renderer,
 ytd-guide-section-renderer:has(#guide-section-title) /* "Explorează", "Mai multe de la YouTube" */
 { display: none !important; }
 
+/* previzualizarea de la hover (ytd-video-preview) stă parcată în afara ecranului; după ce fereastra
+   a fost maximizată și readusă, rămâne dincolo de marginea dreaptă și aduce o bară de scroll orizontală */
+html { overflow-x: clip !important; }
+
 /* ---------- Grilă: lățimea cardului din Setări, coloanele se calculează singure ---------- */
 ytd-rich-grid-renderer #contents {
   display: grid !important;
@@ -140,21 +144,8 @@ ytd-rich-grid-renderer #contents > :not(ytd-rich-item-renderer) { grid-column: 1
 #masthead-container :is(button, a, input, form, ytd-searchbox, yt-searchbox, ytd-topbar-menu-button-renderer, #yp-settings) {
   -webkit-app-region: no-drag; app-region: no-drag;
 }
-/* loc pentru butoanele Windows (minimizare / maximizare / închidere), puse de page.js peste capătul barei */
+/* loc pentru butoanele Windows (minimizare / maximizare / închidere), puse de frame.js peste capătul barei */
 ytd-masthead #end { padding-right: 138px; }
-#yp-caption {
-  position: fixed; top: 0; right: 0; z-index: 10000; display: flex; height: 56px;
-  -webkit-app-region: no-drag; app-region: no-drag;
-}
-#yp-caption button {
-  width: 46px; height: 100%; border: 0; padding: 0; background: transparent; color: #fff;
-  font: 10px "Segoe Fluent Icons", "Segoe MDL2 Assets"; cursor: default;
-}
-#yp-caption button:hover { background: rgba(255, 255, 255, 0.1); }
-#yp-caption .yp-caption-close:hover { background: #c42b1c; }
-#yp-caption button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-/* pe tot ecranul (F11 sau butonul playerului) nu e nicio bară de titlu */
-html.yp-fullscreen #yp-caption, html:has(:fullscreen) #yp-caption { display: none; }
 #yp-settings {
   width: 40px; height: 40px; margin-left: 8px; border: 0; border-radius: 50%; padding: 8px;
   background: transparent; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;

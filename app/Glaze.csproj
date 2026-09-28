@@ -8,7 +8,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>Glaze</AssemblyName>
     <RootNamespace>Glaze</RootNamespace>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <Product>Glaze</Product>
     <Company>Protagonist Labs</Company>
     <ApplicationIcon>..\build\icon.ico</ApplicationIcon>
@@ -22,7 +22,7 @@
   <!-- The page files and SponsorBlock travel inside the exe, so the portable build is one file.
        Resources.Extract unpacks them next to the WebView2 data when the version changes. -->
   <ItemGroup>
-    <EmbeddedResource Include="..\style.css;..\settings.html;..\background.png;page.js" LogicalName="web/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\style.css;..\settings.html;..\background.png;..\build\icon.png;page.js;frame.js" LogicalName="web/%(Filename)%(Extension)" />
     <EmbeddedResource Include="..\extensions\**\*" LogicalName="ext/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
