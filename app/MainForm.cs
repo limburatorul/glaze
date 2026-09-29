@@ -250,6 +250,27 @@ public sealed class MainForm : Form
     }
 
     /// <summary>
+    /// Google rotates its sign-in cookies while YouTube is open, and WebView2 writes cookies to disk only
+    /// now and then. Left open when Windows shuts down, Glaze was killed with the fresh cookies still in
+    /// memory, and the next start opened YouTube signed out. So the close waits for WebView2's browser
+    /// process to exit, which is when it has saved everything.
+    /// </summary>
+    private bool _flushed;
+    protected override async void OnFormClosing(FormClosingEventArgs e)
+    {
+        base.OnFormClosing(e);
+        if (_flushed || e.Cancel || _env == null) return;
+        e.Cancel = true;
+        var exited = new TaskCompletionSource();
+        _env.BrowserProcessExited += (_, _) => exited.TrySetResult();
+        _settings?.Close();
+        _web.Dispose();
+        await Task.WhenAny(exited.Task, Task.Delay(5000));
+        _flushed = true;
+        Close();
+    }
+
+    /// <summary>
     /// No title bar, but the rest of a normal window: the caption is cut off the top of the frame while
     /// the side and bottom borders stay, so resizing, snapping and the shadow keep working. YouTube's
     /// top bar takes the caption's place (page.js draws the buttons, style.css the drag region).
