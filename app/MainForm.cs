@@ -114,11 +114,17 @@ public sealed class MainForm : Form
         }
     }
 
-    /// <summary>The wallpaper behind the glass: a background.jpg / .png / .webp next to Glaze.exe if there
-    /// is one, otherwise the one Glaze ships with.</summary>
+    /// <summary>Where the image picked in Settings is kept, as background.jpg / .png / .webp.</summary>
+    public static readonly string PickedBackgroundDir = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Glaze");
+    public static readonly string[] BackgroundTypes = ["jpg", "png", "webp"];
+
+    /// <summary>The wallpaper behind the glass: the image picked in Settings, else a background.* next to
+    /// Glaze.exe (how it was chosen before Settings could), else the one Glaze ships with.</summary>
     private static string Wallpaper()
     {
-        var file = new[] { "jpg", "png", "webp" }.Select(e => Path.Combine(AppContext.BaseDirectory, $"background.{e}"))
+        var file = new[] { PickedBackgroundDir, AppContext.BaseDirectory }
+            .SelectMany(dir => BackgroundTypes.Select(e => Path.Combine(dir, $"background.{e}")))
             .Append(Path.Combine(Resources.Web, "background.png")).FirstOrDefault(File.Exists);
         if (file == null) return "";
         var type = Path.GetExtension(file)[1..].Replace("jpg", "jpeg");
@@ -131,7 +137,7 @@ public sealed class MainForm : Form
         Settings.Bool("comments") ? null : "ytd-comments#comments { display: none !important; }",
         Settings.Bool("info") ? null : FullPlayerCss,
         Settings.Bool("ambient") ? "#yp-ambient { display: block !important; }" : null,
-        FormattableString.Invariant($"html {{ --glass-blur-scale: {Settings.Number("blur")}; --yp-card: {Settings.Number("card")}px; }}"),
+        FormattableString.Invariant($"html {{ --glass-blur-scale: {Settings.Number("blur")}; --yp-card: {Settings.Number("card")}px; --bg-dim: {Settings.Number("bgDim")}; --bg-blur: {Settings.Number("bgBlur")}; }}"),
     }.Where(s => s != null));
 
     private static bool OnYouTube(string url) =>
@@ -162,6 +168,13 @@ public sealed class MainForm : Form
     {
         if (key == "onTop") TopMost = Settings.Bool("onTop");
         else Run($"window.__glaze && window.__glaze.css(null, {Js(OptionsCss())})");
+    }
+
+    /// <summary>Called by the settings window after it picked or removed a background image.</summary>
+    public void BackgroundChanged()
+    {
+        _baseCss = Resources.Text("style.css") + Wallpaper();
+        Run($"window.__glaze && window.__glaze.css({Js(_baseCss)}, {Js(OptionsCss())})");
     }
 
     private void OnMessage(object? sender, CoreWebView2WebMessageReceivedEventArgs e)

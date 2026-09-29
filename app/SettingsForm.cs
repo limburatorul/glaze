@@ -42,7 +42,7 @@ public sealed class SettingsForm : Form
         MaximizeBox = MinimizeBox = false;
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.CenterParent;
-        ClientSize = new Size(420, 641);
+        ClientSize = new Size(420, 820);
         // Black is what DWM treats as see-through once the frame covers the window (Native.Acrylic).
         BackColor = Color.Black;
         Controls.Add(_web);
@@ -87,5 +87,42 @@ public sealed class SettingsForm : Form
             var key = (string)msg["key"]!;
             if (Settings.Set(key, msg["value"])) _main.SettingChanged(key);
         }
+        else if (type == "pickBackground") PickBackground();
+        else if (type == "resetBackground")
+        {
+            RemovePickedBackground();
+            _main.BackgroundChanged();
+        }
+    }
+
+    private void PickBackground()
+    {
+        using var dialog = new OpenFileDialog
+        {
+            Title = "Choose a background image",
+            Filter = "Images (*.jpg;*.jpeg;*.png;*.webp)|*.jpg;*.jpeg;*.png;*.webp",
+        };
+        if (dialog.ShowDialog(this) != DialogResult.OK) return;
+        var type = Path.GetExtension(dialog.FileName).TrimStart('.').ToLowerInvariant().Replace("jpeg", "jpg");
+        if (!MainForm.BackgroundTypes.Contains(type)) return;
+        try
+        {
+            RemovePickedBackground();
+            Directory.CreateDirectory(MainForm.PickedBackgroundDir);
+            File.Copy(dialog.FileName, Path.Combine(MainForm.PickedBackgroundDir, $"background.{type}"));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            MessageBox.Show(this, $"Glaze couldn't use that image.\n\n{ex.Message}", "Glaze", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        _main.BackgroundChanged();
+    }
+
+    // A copy is kept, not the path: the picked file can be moved or deleted later.
+    private static void RemovePickedBackground()
+    {
+        foreach (var type in MainForm.BackgroundTypes)
+            File.Delete(Path.Combine(MainForm.PickedBackgroundDir, $"background.{type}"));
     }
 }

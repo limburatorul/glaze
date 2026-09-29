@@ -40,7 +40,13 @@
   .links a { color: var(--text); text-decoration: none; }
   .links a:hover { color: var(--accent); }
   .links span { color: var(--muted); user-select: text; }
-  input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .buttons { display: flex; gap: 8px; padding: 10px 0; }
+  button {
+    font: inherit; color: var(--text); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px; padding: 6px 12px; cursor: pointer;
+  }
+  button:hover { background: rgba(255, 255, 255, 0.16); }
+  input:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -63,6 +69,19 @@
     </label>
   </section>
   <section>
+    <h2>Background</h2>
+    <div class="buttons">
+      <button type="button" data-action="pickBackground">Choose image…</button>
+      <button type="button" data-action="resetBackground">Use the default</button>
+    </div>
+    <label>Darken
+      <span class="range"><input type="range" data-key="bgDim" min="0" max="2" step="0.1"><output></output></span>
+    </label>
+    <label>Blur
+      <span class="range"><input type="range" data-key="bgBlur" min="0" max="40" step="2"><output></output></span>
+    </label>
+  </section>
+  <section>
     <h2>Video grid</h2>
     <label>Card width
       <span class="range"><input type="range" data-key="card" min="180" max="600" step="10"><output></output></span>
@@ -78,7 +97,10 @@
     </div>
   </section>
 <script>
-  const show = { blur: v => v === 0 ? 'off' : `${Math.round(v * 100)}%`, card: v => `${v}px` };
+  const show = { blur: v => v === 0 ? 'off' : `${Math.round(v * 100)}%`, card: v => `${v}px`,
+    bgDim: v => `${Math.round(v * 100)}%`, bgBlur: v => v === 0 ? 'off' : `${v}px` };
+  for (const b of document.querySelectorAll('[data-action]'))
+    b.addEventListener('click', () => window.chrome.webview.postMessage({ type: b.dataset.action }));
   window.ytPlayer.getSettings().then(settings => {
     for (const input of document.querySelectorAll('[data-key]')) {
       const key = input.dataset.key;

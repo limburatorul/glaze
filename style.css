@@ -38,15 +38,19 @@ ytd-feed-filter-chip-bar-renderer #chips-wrapper {
   backdrop-filter: blur(calc(33.6px * var(--glass-blur-scale, 1))) saturate(2) brightness(1.05);
 }
 
-/* ---------- Fundal cu imagine (background.png din aplicație, sau background.* lângă Glaze.exe) ---------- */
+/* ---------- Fundal cu imagine (aleasă în Setări, background.* lângă Glaze.exe, sau cea din aplicație) ---------- */
 html {
-  background: #0e0e12 var(--wallpaper, none) center / cover fixed !important;
+  background: #0e0e12 !important;
   --yt-spec-base-background: transparent !important;
 }
-/* vinietă: ține textul lizibil indiferent de imagine */
+/* imaginea, estompată cât cere Setări (--bg-blur), sub o vinietă care ține textul lizibil (--bg-dim).
+   Marginea iese din ecran cât blur-ul, altfel s-ar vedea marginile estompate spre negru. */
 html::before {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
-  background: radial-gradient(ellipse at center, rgba(14,14,18,0.25), rgba(14,14,18,0.6));
+  content: ""; position: fixed; inset: calc(var(--bg-blur, 0) * -2px); pointer-events: none; z-index: -1;
+  background:
+    radial-gradient(ellipse at center, rgba(14,14,18,calc(0.25 * var(--bg-dim, 1))), rgba(14,14,18,calc(0.6 * var(--bg-dim, 1)))),
+    var(--wallpaper, none) center / cover;
+  filter: blur(calc(var(--bg-blur, 0) * 1px));
 }
 body, ytd-app, #page-manager, ytd-browse, ytd-watch-flexy, ytd-search,
 ytd-two-column-browse-results-renderer, #columns { background: transparent !important; }

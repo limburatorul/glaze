@@ -17,9 +17,9 @@ public static class Settings
     {
         ["related"] = JsonValue.Create(false), ["comments"] = JsonValue.Create(false), ["info"] = JsonValue.Create(false),
         ["ambient"] = JsonValue.Create(true), ["blur"] = JsonValue.Create(1.0), ["card"] = JsonValue.Create(300.0),
-        ["onTop"] = JsonValue.Create(false),
+        ["onTop"] = JsonValue.Create(false), ["bgDim"] = JsonValue.Create(1.0), ["bgBlur"] = JsonValue.Create(0.0),
     };
-    private static readonly Dictionary<string, (double Min, double Max)> Limits = new() { ["blur"] = (0, 2), ["card"] = (180, 600) };
+    private static readonly Dictionary<string, (double Min, double Max)> Limits = new() { ["blur"] = (0, 2), ["card"] = (180, 600), ["bgDim"] = (0, 2), ["bgBlur"] = (0, 40) };
 
     private static readonly JsonObject Values = Load();
 
