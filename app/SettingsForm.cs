@@ -109,14 +109,37 @@ public sealed class SettingsForm : Form
         {
             RemovePickedBackground();
             Directory.CreateDirectory(MainForm.PickedBackgroundDir);
-            File.Copy(dialog.FileName, Path.Combine(MainForm.PickedBackgroundDir, $"background.{type}"));
+            if (type == "webp") File.Copy(dialog.FileName, Path.Combine(MainForm.PickedBackgroundDir, "background.webp"));
+            else SaveScreenSized(dialog.FileName, Path.Combine(MainForm.PickedBackgroundDir, "background.jpg"));
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or OutOfMemoryException)
         {
             MessageBox.Show(this, $"Glaze couldn't use that image.\n\n{ex.Message}", "Glaze", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
         _main.BackgroundChanged();
+    }
+
+    /// <summary>The wallpaper goes into YouTube's page inline, so a photo straight off a camera (10 MB and
+    /// more) never showed up. It is kept at the size of the largest screen, which is all it is shown at.
+    /// (System.Drawing throws OutOfMemoryException for a file it can't read as an image.)</summary>
+    private static void SaveScreenSized(string source, string target)
+    {
+        using var image = Image.FromFile(source);
+        // Phones store a photo sideways plus a tag saying how to turn it; the resave would drop the tag.
+        if (image.PropertyIdList.Contains(0x0112))
+            image.RotateFlip(image.GetPropertyItem(0x0112)!.Value![0] switch
+            {
+                3 => RotateFlipType.Rotate180FlipNone, 6 => RotateFlipType.Rotate90FlipNone,
+                8 => RotateFlipType.Rotate270FlipNone, _ => RotateFlipType.RotateNoneFlipNone,
+            });
+        var screen = Screen.AllScreens.Aggregate(Size.Empty, (s, x) => new Size(Math.Max(s.Width, x.Bounds.Width), Math.Max(s.Height, x.Bounds.Height)));
+        var scale = Math.Min(1, Math.Max((double)screen.Width / image.Width, (double)screen.Height / image.Height));
+        using var sized = new Bitmap(image, (int)Math.Round(image.Width * scale), (int)Math.Round(image.Height * scale));
+        var jpeg = System.Drawing.Imaging.ImageCodecInfo.GetImageEncoders().First(c => c.FormatID == System.Drawing.Imaging.ImageFormat.Jpeg.Guid);
+        using var quality = new System.Drawing.Imaging.EncoderParameters(1);
+        quality.Param[0] = new System.Drawing.Imaging.EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
+        sized.Save(target, jpeg, quality);
     }
 
     // A copy is kept, not the path: the picked file can be moved or deleted later.

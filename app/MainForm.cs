@@ -128,7 +128,9 @@ public sealed class MainForm : Form
             .Append(Path.Combine(Resources.Web, "background.png")).FirstOrDefault(File.Exists);
         if (file == null) return "";
         var type = Path.GetExtension(file)[1..].Replace("jpg", "jpeg");
-        return $"html{{--wallpaper:url(\"data:image/{type};base64,{Convert.ToBase64String(File.ReadAllBytes(file))}\")}}";
+        // Straight into the rule, not through a CSS variable: Chromium drops a variable longer than 2 MB,
+        // which a photo is once base64 encoded.
+        return $"html::after{{background-image:url(\"data:image/{type};base64,{Convert.ToBase64String(File.ReadAllBytes(file))}\")}}";
     }
 
     private static string OptionsCss() => string.Join("\n", new[]

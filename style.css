@@ -43,14 +43,17 @@ html {
   background: #0e0e12 !important;
   --yt-spec-base-background: transparent !important;
 }
-/* imaginea, estompată cât cere Setări (--bg-blur), sub o vinietă care ține textul lizibil (--bg-dim).
+/* imaginea (pusă de Glaze ca background-image pe html::after), estompată cât cere Setări (--bg-blur).
    Marginea iese din ecran cât blur-ul, altfel s-ar vedea marginile estompate spre negru. */
-html::before {
-  content: ""; position: fixed; inset: calc(var(--bg-blur, 0) * -2px); pointer-events: none; z-index: -1;
-  background:
-    radial-gradient(ellipse at center, rgba(14,14,18,calc(0.25 * var(--bg-dim, 1))), rgba(14,14,18,calc(0.6 * var(--bg-dim, 1)))),
-    var(--wallpaper, none) center / cover;
+html::after {
+  content: ""; position: fixed; inset: calc(var(--bg-blur, 0) * -2px); pointer-events: none; z-index: -2;
+  background: none center / cover;
   filter: blur(calc(var(--bg-blur, 0) * 1px));
+}
+/* vinietă peste imagine: ține textul lizibil (--bg-dim) */
+html::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+  background: radial-gradient(ellipse at center, rgba(14,14,18,calc(0.25 * var(--bg-dim, 1))), rgba(14,14,18,calc(0.6 * var(--bg-dim, 1))));
 }
 body, ytd-app, #page-manager, ytd-browse, ytd-watch-flexy, ytd-search,
 ytd-two-column-browse-results-renderer, #columns { background: transparent !important; }
