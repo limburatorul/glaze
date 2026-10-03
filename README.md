@@ -67,3 +67,8 @@ C#, WinForms and WebView2. `style.css`, `settings.html` and `app/page.js` are wh
 GPL-3.0, because it ships SponsorBlock, which is GPL-3.0. SponsorBlock's source for the bundled version is at [github.com/ajayyy/SponsorBlock/tree/6.1.7](https://github.com/ajayyy/SponsorBlock/tree/6.1.7); the third-party notices it carries are in `extensions/SponsorBlock/oss-attribution`.
 
 Made by [Protagonist Labs](https://protagonistlabs.app/).
+
+## More from Protagonist Labs
+
+- [Cursor Selector](https://protagonistlabs.app/cursorselector/?utm_source=github&utm_medium=readme&utm_campaign=glaze): previews and applies cursor schemes, free.
+- [All apps](https://protagonistlabs.app/?utm_source=github&utm_medium=readme&utm_campaign=glaze): Windows apps that each do one job properly.
