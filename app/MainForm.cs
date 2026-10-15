@@ -26,9 +26,12 @@ public sealed class MainForm : Form
     private SettingsForm? _settings;
     private string _frameJs = "", _pageJs = "", _baseCss = "";
     private (FormWindowState State, Rectangle Bounds)? _beforeFullScreen;
+    // The page a start was asked to open (a youtube.com address on the command line), else YouTube's home.
+    private string _startUrl;
 
-    public MainForm()
+    public MainForm(string? url)
     {
+        _startUrl = url ?? Home;
         Text = "Glaze";
         Icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath!);
         Size = new Size(1280, 800);
@@ -90,7 +93,7 @@ public sealed class MainForm : Form
         };
         core.ContainsFullScreenElementChanged += (_, _) => SetFullScreen(core.ContainsFullScreenElement);
         core.DocumentTitleChanged += (_, _) => Text = core.DocumentTitle is { Length: > 0 } t ? t : "Glaze";
-        core.Navigate(Home);
+        core.Navigate(_startUrl);
 
         Updater.StartChecks(this);
     }
@@ -142,7 +145,19 @@ public sealed class MainForm : Form
         FormattableString.Invariant($"html {{ --glass-blur-scale: {Settings.Number("blur")}; --yp-card: {Settings.Number("card")}px; --bg-dim: {Settings.Number("bgDim")}; --bg-blur: {Settings.Number("bgBlur")}; }}"),
     }.Where(s => s != null));
 
-    private static bool OnYouTube(string url) =>
+    /// <summary>A later start of Glaze, handed over by Program: come forward, and open its page if it
+    /// brought one (already checked to be on YouTube).</summary>
+    public void Open(string? url)
+    {
+        if (WindowState == FormWindowState.Minimized) WindowState = FormWindowState.Normal;
+        Activate();
+        if (url == null) return;
+        // Kept as well, in case Start() is still on its way to its first navigation.
+        _startUrl = url;
+        _web.CoreWebView2?.Navigate(url);
+    }
+
+    public static bool OnYouTube(string url) =>
         Uri.TryCreate(url, UriKind.Absolute, out var u) && u.Scheme == "https" && u.Host == "www.youtube.com";
 
     private async Task Inject()

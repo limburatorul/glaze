@@ -81,18 +81,33 @@ public sealed class SettingsForm : Form
         try { msg = JsonNode.Parse(e.WebMessageAsJson); } catch (JsonException) { return; }
         var type = msg?["type"]?.GetValueKind() == JsonValueKind.String ? (string?)msg["type"] : null;
         if (type == "get")
+        {
             _web.CoreWebView2.PostWebMessageAsJson($$"""{"type":"settings","settings":{{Settings.Json}}}""");
+            _ = PostWorksWith();
+        }
         else if (type == "set" && msg!["key"]?.GetValueKind() == JsonValueKind.String)
         {
             var key = (string)msg["key"]!;
             if (Settings.Set(key, msg["value"])) _main.SettingChanged(key);
         }
+        // Works with's page links: only the studio's site, in the user's browser, as the footer links.
+        else if (type == "openPage" && msg!["url"]?.GetValueKind() == JsonValueKind.String && External.IsMatch((string)msg["url"]!))
+            Process.Start(new ProcessStartInfo((string)msg["url"]!) { UseShellExecute = true });
+        else if (type == "openSister" && msg!["id"]?.GetValueKind() == JsonValueKind.String) Ecosystem.OpenSister((string)msg["id"]!);
         else if (type == "pickBackground") PickBackground();
         else if (type == "resetBackground")
         {
             RemovePickedBackground();
             _main.BackgroundChanged();
         }
+    }
+
+    /// <summary>"Works with", read off the UI thread each time the page opens, so an app installed since
+    /// shows up.</summary>
+    private async Task PostWorksWith()
+    {
+        var worksWith = await Task.Run(Ecosystem.WorksWith);
+        if (!_web.IsDisposed) _web.CoreWebView2?.PostWebMessageAsJson(worksWith.ToJsonString());
     }
 
     private void PickBackground()

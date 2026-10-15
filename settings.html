@@ -40,6 +40,11 @@
   .links a { color: var(--text); text-decoration: none; }
   .links a:hover { color: var(--accent); }
   .links span { color: var(--muted); user-select: text; }
+  /* Works with: hint text; the names are the only links and look like the text until hovered. */
+  .lines { color: var(--muted); font-size: 12px; padding: 6px 0 10px; }
+  .lines p { margin: 4px 0; }
+  .lines a { color: inherit; text-decoration: none; }
+  .lines a:hover, .lines a:focus-visible { color: var(--text); text-decoration: underline; }
   .buttons { display: flex; gap: 8px; padding: 10px 0; }
   button {
     font: inherit; color: var(--text); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.12);
@@ -87,6 +92,10 @@
       <span class="range"><input type="range" data-key="card" min="180" max="600" step="10"><output></output></span>
     </label>
   </section>
+  <section id="works-with" hidden>
+    <h2>Works with</h2>
+    <div class="lines"></div>
+  </section>
   <section>
     <h2>Glaze</h2>
     <div class="links">
@@ -97,6 +106,31 @@
     </div>
   </section>
 <script>
+  // Sent by Glaze after the settings: the Protagonist Labs apps that add something here, and one discount line.
+  window.chrome.webview.addEventListener('message', e => {
+    if (!e.data || e.data.type !== 'worksWith') return;
+    const link = (name, onClick) => {
+      const a = document.createElement('a');
+      a.textContent = name;
+      a.href = '#';
+      a.addEventListener('click', ev => { ev.preventDefault(); onClick(); });
+      return a;
+    };
+    const page = url => () => window.chrome.webview.postMessage({ type: 'openPage', url });
+    const lines = e.data.sisters.map(s => {
+      const p = document.createElement('p');
+      p.append(link(s.name, s.url ? page(s.url) : () => window.chrome.webview.postMessage({ type: 'openSister', id: s.id })), ' · ' + s.text);
+      return p;
+    });
+    if (e.data.offer.length > 0) {
+      const p = document.createElement('p');
+      p.append('Owners of one of our apps get 30% off the others: ');
+      e.data.offer.forEach((o, i) => p.append(...(i > 0 ? [' · '] : []), link(o.name, page(o.url))));
+      lines.push(p);
+    }
+    document.querySelector('#works-with .lines').replaceChildren(...lines);
+    document.getElementById('works-with').hidden = lines.length === 0;
+  });
   const show = { blur: v => v === 0 ? 'off' : `${Math.round(v * 100)}%`, card: v => `${v}px`,
     bgDim: v => `${Math.round(v * 100)}%`, bgBlur: v => v === 0 ? 'off' : `${v}px` };
   for (const b of document.querySelectorAll('[data-action]'))

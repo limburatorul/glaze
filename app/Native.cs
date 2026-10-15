@@ -22,6 +22,11 @@ internal static class Native
     [DllImport("user32.dll")]
     public static extern int GetSystemMetrics(int index);
 
+    public const int ASFW_ANY = -1;
+
+    [DllImport("user32.dll")]
+    public static extern bool AllowSetForegroundWindow(int processId);
+
     public static void DarkTitleBar(IntPtr hwnd)
     {
         var on = 1;
