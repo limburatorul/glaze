@@ -95,11 +95,20 @@ public sealed class SettingsForm : Form
             Process.Start(new ProcessStartInfo((string)msg["url"]!) { UseShellExecute = true });
         else if (type == "openSister" && msg!["id"]?.GetValueKind() == JsonValueKind.String) Ecosystem.OpenSister((string)msg["id"]!);
         else if (type == "pickBackground") PickBackground();
+        else if (type == "checkUpdates") _ = CheckUpdates();
         else if (type == "resetBackground")
         {
             RemovePickedBackground();
             _main.BackgroundChanged();
         }
+    }
+
+    /// <summary>Settings → Check for updates: a newer version opens the update dialog over this window; otherwise
+    /// the answer (latest version, or that the check failed) is written under the button.</summary>
+    private async Task CheckUpdates()
+    {
+        var answer = await Updater.CheckAndPrompt(this, manual: true);
+        if (!_web.IsDisposed) _web.CoreWebView2?.PostWebMessageAsJson(JsonSerializer.Serialize(new { type = "updateStatus", text = answer ?? "" }));
     }
 
     /// <summary>"Works with", read off the UI thread each time the page opens, so an app installed since

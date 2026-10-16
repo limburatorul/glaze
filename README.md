@@ -19,7 +19,7 @@ Glaze is not affiliated with, endorsed by or sponsored by YouTube or Google. It 
 - **Video grid you can size.** A card width slider (180–600 px); the number of columns follows.
 - **Always on top**, from Settings or `Ctrl+T`.
 - **Signing in to Google works.** Glaze runs on Microsoft's WebView2 (the Edge engine built into Windows 11), which Google accepts for sign-in. Glaze 1.x ran on Electron, where Google refused it as "not a secure browser".
-- **Updates itself**, installed or portable: it checks this repo's releases shortly after it starts and every 10 minutes, and asks before it updates. The download is checked against the size and SHA-256 GitHub publishes for it, then Glaze restarts on the new version.
+- **Updates itself**, installed or portable: it checks this repo's releases shortly after it starts and every hour (or when you press Check for updates in Settings), and asks before it updates. The download is checked against the size and SHA-256 GitHub publishes for it, then Glaze restarts on the new version.
 
 ## Shortcuts
 

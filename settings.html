@@ -104,8 +104,16 @@
       <a href="https://protagonistlabs.app/glaze/?utm_source=glaze&amp;utm_medium=app&amp;utm_campaign=settings">Website</a>
       <a href="https://protagonistlabs.app/?utm_source=glaze&amp;utm_medium=app&amp;utm_campaign=more-apps">More apps from Protagonist Labs</a>
     </div>
+    <div class="buttons">
+      <button type="button" data-action="checkUpdates">Check for updates</button>
+    </div>
+    <p id="update-status" class="lines" role="status"></p>
   </section>
 <script>
+  // The answer to Check for updates (empty when the update dialog opened instead).
+  window.chrome.webview.addEventListener('message', e => {
+    if (e.data && e.data.type === 'updateStatus') document.getElementById('update-status').textContent = e.data.text;
+  });
   // Sent by Glaze after the settings: the Protagonist Labs apps that add something here, and one discount line.
   window.chrome.webview.addEventListener('message', e => {
     if (!e.data || e.data.type !== 'worksWith') return;
@@ -134,7 +142,10 @@
   const show = { blur: v => v === 0 ? 'off' : `${Math.round(v * 100)}%`, card: v => `${v}px`,
     bgDim: v => `${Math.round(v * 100)}%`, bgBlur: v => v === 0 ? 'off' : `${v}px` };
   for (const b of document.querySelectorAll('[data-action]'))
-    b.addEventListener('click', () => window.chrome.webview.postMessage({ type: b.dataset.action }));
+    b.addEventListener('click', () => {
+      if (b.dataset.action === 'checkUpdates') document.getElementById('update-status').textContent = 'Checking…';
+      window.chrome.webview.postMessage({ type: b.dataset.action });
+    });
   window.ytPlayer.getSettings().then(settings => {
     for (const input of document.querySelectorAll('[data-key]')) {
       const key = input.dataset.key;
